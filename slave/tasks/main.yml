@@ -1,0 +1,90 @@
+---
+- name: Install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+    - Percona-Server-server-57
+    - MySQL-python
+
+- name: Copy MySQL configs
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ mysql_config_dir }}/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: 01-base.cnf.j2, dest: 01-base.cnf }
+    - { src: 02-max-connections.cnf.j2, dest: 02-max-connections.cnf }
+    - { src: 03-performance.cnf.j2, dest: 03-performance.cnf }
+    - { src: 04-slow-query.cnf.j2, dest: 04-slow-query.cnf }
+    - { src: 05-binlog.cnf.j2, dest: 05-binlog.cnf }
+
+- name: start mysqld
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Get temporary generated root password
+  shell: grep 'root@localhost:' /var/log/mysqld.log | awk '{print $11}'
+  register: temporary_root_password
+  args:
+    creates: "{{ mysql_root_mycnf_path }}"
+
+- name: Update root password
+  shell: >
+    mysql -uroot -p'{{ temporary_root_password.stdout }}' --connect-expired-password
+    -e "ALTER USER USER() IDENTIFIED BY '{{ mysql_root_password }}';"
+  args:
+    creates: "{{ mysql_root_mycnf_path }}"
+
+- name: Copy root my.cnf file
+  template:
+    src: my.cnf.j2
+    dest: "{{ mysql_root_mycnf_path }}"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Push dump file from host to slave
+  copy:
+    src: "{{ mysql_replication_dump_path }}"
+    dest: "{{ mysql_replication_dump_path }}"
+
+- name: Edit replication config
+  replace:
+    path: "{{ mysql_replication_config_file }}"
+    regexp: '^#(replicate-ignore-table)'
+    replace: '\1'
+  notify: 
+    - restart mysqld
+
+- name: Create database
+  mysql_db:
+    name: "{{ mysql_db_name }}"
+    state: present
+
+- name: reset master
+  shell: mysql -e "reset master;"
+
+- name: restore database
+  mysql_db:
+    name: "{{ mysql_db_name }}"
+    state: import
+    target: "{{ mysql_replication_dump_path }}"
+
+- name: Change master to host "master"
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{ mysql_master_ip }}"
+    master_port: "{{ mysql_master_port }}"
+    master_user: "{{ mysql_master_user }}"
+    master_password: "{{ mysql_master_password }}"
+    master_auto_position: "{{ mysql_master_auto_position }}"
+
+- name: Start slave
+  mysql_replication:
+    mode: startslave

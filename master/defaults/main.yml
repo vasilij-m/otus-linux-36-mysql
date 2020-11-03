@@ -1,0 +1,62 @@
+---
+mysql_config_dir: /etc/my.cnf.d
+
+# 01-base.cnf
+mysql_pid_file: /var/run/mysqld/mysqld.pid
+mysql_log_error: /var/log/mysqld.log
+mysql_datadir: /var/lib/mysql
+mysql_socket: /var/lib/mysql/mysql.sock
+mysql_symbolic_links: "0"
+
+mysql_server_id: "1"
+mysql_innodb_file_per_table: "1"
+mysql_skip_name_resolve: true
+
+# 02-max-connections.cnf
+mysql_wait_timeout: "60"
+mysql_max_connections: "500"
+
+# 03-performance.cnf
+mysql_skip_external_locking: true
+mysql_key_buffer_size: "384M"
+mysql_max_allowed_packet: "16M"
+mysql_table_open_cache: "5000"
+mysql_sort_buffer_size: "64M"
+mysql_join_buffer_size: "64M"
+mysql_read_buffer_size: "2M"
+mysql_read_rnd_buffer_size: "8M"
+mysql_myisam_sort_buffer_size: "64M"
+mysql_thread_cache_size: "8"
+mysql_query_cache_limit: "64M"
+mysql_query_cache_size: "1024M"
+mysql_tmp_table_size: "1024M"
+mysql_max_heap_table_size: "1024M"
+mysql_innodb_buffer_pool_size: "800M"
+
+# 04-slow-query.cnf
+mysql_slow_query_log: "1"
+mysql_log_output: "TABLE"
+mysql_long_query_time: "2"
+
+# 05-binlog.cnf
+mysql_log_bin: "mysql-bin"
+mysql_expire_logs_days: "7"
+mysql_max_binlog_size: "16M"
+mysql_binlog_format: "MIXED"
+mysql_log_slave_updates: "On"
+mysql_gtid_mode: "On"
+mysql_enforce_gtid_consistency: "On"
+
+mysql_root_password: "MySqlP@ssw0rd"
+mysql_root_mycnf_path: /root/.my.cnf
+
+mysql_db_name: bet
+mysql_db_dump_path: /vagrant/bet.dmp
+
+mysql_replication_user: 'repl'
+mysql_replication_user_password: 'P@ssw0rdForRepl'
+mysql_replication_user_privilege: '*.*:REPLICATION SLAVE'
+mysql_replication_ignored_tables:
+  - bet.events_on_demand
+  - bet.v_same_event
+mysql_replication_dump_path: /tmp/master.sql

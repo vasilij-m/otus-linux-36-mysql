@@ -1,0 +1,18 @@
+[mysqld]
+{% if mysql_skip_external_locking %}
+skip-external-locking
+{% endif %}
+key-buffer-size = {{ mysql_key_buffer_size }}
+max-allowed-packet = {{ mysql_max_allowed_packet }}
+table-open-cache = {{ mysql_table_open_cache }}
+sort-buffer-size = {{ mysql_sort_buffer_size }}
+join-buffer-size = {{ mysql_join_buffer_size }}
+read-buffer-size = {{ mysql_read_buffer_size }}
+read-rnd-buffer-size = {{ mysql_read_rnd_buffer_size }}
+myisam-sort-buffer-size = {{ mysql_myisam_sort_buffer_size }}
+thread-cache-size = {{ mysql_thread_cache_size }}
+query-cache-limit = {{ mysql_query_cache_limit }}
+query-cache-size = {{ mysql_query_cache_size }}
+tmp-table-size = {{ mysql_tmp_table_size }}
+max-heap-table-size = {{ mysql_max_heap_table_size }}
+innodb_buffer_pool_size = {{ mysql_innodb_buffer_pool_size }}

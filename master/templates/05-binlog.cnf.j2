@@ -1,0 +1,10 @@
+[mysqld]
+log-bin = {{ mysql_log_bin }}
+expire-logs-days = {{ mysql_expire_logs_days }}
+max-binlog-size = {{ mysql_max_binlog_size }}
+binlog-format = {{ mysql_binlog_format }}
+
+# GTID replication config
+log-slave-updates = {{ mysql_log_slave_updates }}
+gtid-mode = {{ mysql_gtid_mode }}
+enforce-gtid-consistency = {{ mysql_enforce_gtid_consistency }}
