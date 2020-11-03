@@ -321,8 +321,8 @@ Executed_Gtid_Set: 9dfab19f-106a-11eb-909a-5254004d77d3:1-38
 ## Проверка задания
 
 **Requirements:**
-1. ***Перед проверкой задания необходимо установить плагин vagrant-vbguest: `vagrant plugin install vagrant-vbguest`.***
-2. ***Ansible 2.7***
+* **Перед проверкой задания необходимо установить плагин vagrant-vbguest: `vagrant plugin install vagrant-vbguest`.**
+* **Ansible 2.7**
 
 1. Выполнить `vagrant up`.
 
